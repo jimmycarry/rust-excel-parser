@@ -1,0 +1,62 @@
+# Rust build artifacts
+/target/
+Cargo.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Test files and outputs
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.csv
+*.json
+*.txt
+test_*.json
+test_*.csv
+test_*.txt
+data.csv
+test_output.*
+test_table.*
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Backup files
+*.bak
+*.orig
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Documentation build
+/docs/_build/
+
+# Rust-specific
+**/*.rs.bk
+*.pdb
+
+# Coverage reports
+lcov.info
+coverage/
+
+# Benchmark results
+criterion/
+
+# Cache directories
+.cache/
