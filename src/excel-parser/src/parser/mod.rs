@@ -1,6 +1,6 @@
+use crate::error::{ExcelParserError, Result};
 use calamine::{open_workbook_auto, Data, Reader, Sheets};
 use std::path::Path;
-use crate::error::{ExcelParserError, Result};
 
 pub struct ExcelParser;
 
@@ -23,10 +23,12 @@ impl ExcelParser {
     /// Parse Excel file and return structured data
     pub fn parse<P: AsRef<Path>>(&self, file_path: P) -> Result<ExcelData> {
         let file_path = file_path.as_ref();
-        
+
         // Check if file exists
         if !file_path.exists() {
-            return Err(ExcelParserError::FileNotFound(file_path.display().to_string()));
+            return Err(ExcelParserError::FileNotFound(
+                file_path.display().to_string(),
+            ));
         }
 
         // Get file extension to determine format
@@ -87,7 +89,7 @@ impl ExcelParser {
     fn parse_xlsx_sheet<P: AsRef<Path>>(&self, file_path: P, sheet_name: &str) -> Result<Sheet> {
         let file_path = file_path.as_ref();
         let mut workbook: Sheets<_> = open_workbook_auto(file_path)?;
-        
+
         self.extract_sheet_data(&mut workbook, sheet_name)?
             .ok_or_else(|| ExcelParserError::SheetNotFound(sheet_name.to_string()))
     }
@@ -97,15 +99,19 @@ impl ExcelParser {
         self.parse_xlsx_sheet(file_path, sheet_name)
     }
 
-    fn extract_sheet_data<R: std::io::Read + std::io::Seek>(&self, workbook: &mut Sheets<R>, sheet_name: &str) -> Result<Option<Sheet>> {
+    fn extract_sheet_data<R: std::io::Read + std::io::Seek>(
+        &self,
+        workbook: &mut Sheets<R>,
+        sheet_name: &str,
+    ) -> Result<Option<Sheet>> {
         let range = workbook.worksheet_range(sheet_name)?;
-        
+
         if range.is_empty() {
             return Ok(None);
         }
 
         let mut data = Vec::new();
-        
+
         for row in range.rows() {
             let mut row_data = Vec::new();
             for cell in row {
@@ -129,7 +135,7 @@ impl ExcelParser {
                 };
                 row_data.push(cell_value);
             }
-            
+
             // Only add non-empty rows or rows with at least one non-empty cell
             if !row_data.iter().all(|cell| cell.is_empty()) {
                 data.push(row_data);
@@ -168,18 +174,21 @@ mod tests {
     fn test_unsupported_format() {
         use std::fs::File;
         use std::io::Write;
-        
+
         // Create a temporary file with unsupported extension
         let mut temp_file = File::create("test.txt").unwrap();
         temp_file.write_all(b"test content").unwrap();
-        
+
         let parser = ExcelParser::new();
         let result = parser.parse("test.txt");
-        
+
         // Clean up
         std::fs::remove_file("test.txt").unwrap();
-        
-        assert!(matches!(result, Err(ExcelParserError::UnsupportedFormat(_))));
+
+        assert!(matches!(
+            result,
+            Err(ExcelParserError::UnsupportedFormat(_))
+        ));
     }
 
     #[test]

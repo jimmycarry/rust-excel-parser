@@ -1,0 +1,38 @@
+[package]
+name = "excel-parser"
+version = "0.1.0"
+edition = "2021"
+authors = ["Claude Code"]
+description = "A cross-platform Excel parser that converts Excel files to text formats"
+license = "MIT"
+repository = "https://github.com/jimmycarry/rust-excel-parser"
+keywords = ["excel", "parser", "csv", "xlsx", "xls"]
+categories = ["command-line-utilities", "text-processing"]
+
+[[bin]]
+name = "excel-parser"
+path = "src/main.rs"
+
+[lib]
+name = "excel_parser"
+path = "src/lib.rs"
+
+[dependencies]
+calamine = "0.28"
+tabled = "0.16"
+# 使用 workspace 共享依赖
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+csv = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
