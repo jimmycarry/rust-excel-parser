@@ -1,5 +1,4 @@
 use thiserror::Error;
-use std::path::PathBuf;
 
 pub type Result<T> = std::result::Result<T, DocParserError>;
 

@@ -133,7 +133,7 @@ impl Args {
         self.validate_common_options()
     }
 
-    fn validate_batch_mode(&self, batch_pattern: &str) -> Result<()> {
+    fn validate_batch_mode(&self, _batch_pattern: &str) -> Result<()> {
         // 批处理模式不能指定单个输出文件
         if self.output.is_some() {
             return Err(DocParserError::InvalidConfiguration {

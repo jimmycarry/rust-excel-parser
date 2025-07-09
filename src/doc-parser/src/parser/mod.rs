@@ -4,8 +4,10 @@ use std::path::Path;
 pub mod docx;
 pub mod doc;
 pub mod text_extractor;
+pub mod table;
 
 pub use text_extractor::TextExtractor;
+pub use table::{TableData, TableExtractor, TableExtractionConfig, TableRow, TableCell, CellFormatting, TableExtractionMode, TableOutputFormat};
 
 #[derive(Debug, Clone)]
 pub struct DocData {
