@@ -1,0 +1,46 @@
+[package]
+name = "doc-parser"
+version = "0.1.0"
+edition = "2021"
+authors = ["Claude Code"]
+description = "A cross-platform DOC/DOCX parser that extracts text content"
+license = "MIT"
+repository = "https://github.com/jimmycarry/rust-excel-parser"
+keywords = ["doc", "docx", "parser", "text", "word"]
+categories = ["command-line-utilities", "text-processing"]
+
+[[bin]]
+name = "doc-parser"
+path = "src/main.rs"
+
+[lib]
+name = "doc_parser"
+path = "src/lib.rs"
+
+[dependencies]
+# Workspace共享依赖
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# DOC解析特定依赖
+docx-rs = { workspace = true, optional = true }
+dotext = { workspace = true, optional = true }
+regex = { workspace = true }
+glob = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[features]
+default = ["docx"]
+docx = ["docx-rs"]
+legacy-doc = ["dotext"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -98,7 +98,111 @@ Each format implements `OutputWriter` and handles both single sheets and multi-s
 
 ## Performance Considerations
 
+### Excel Parser
 - Uses `calamine`'s lazy loading for large .xlsx/.xlsb files
 - Streaming output architecture processes data as it's read
 - Release build configured with LTO and strip for optimal binary size
 - Memory-efficient: processes rows incrementally rather than loading entire files
+
+### DOC Parser
+- Multiple processing modes: Fast (text-only), Standard, Full (with metadata)
+- Streaming output architecture for memory efficiency
+- Batch processing with progress tracking and error recovery
+- Optimized for both single-file and batch operations
+- Memory-efficient: processes documents incrementally
+
+## Documentation
+
+The doc-parser includes comprehensive documentation:
+
+- **README.md**: Complete user guide with examples
+- **DEVELOPER_GUIDE.md**: Architecture, development setup, and contribution guidelines
+- **TROUBLESHOOTING.md**: Common issues and solutions
+- **examples/**: Usage examples for both CLI and library
+- **API Documentation**: Run `cargo doc --open` for detailed API docs
+
+## DOC Parser Usage Examples
+
+### Single File Processing
+```bash
+# Extract plain text
+doc-parser document.docx
+
+# Convert to JSON with metadata
+doc-parser document.docx -f json --metadata --pretty
+
+# Convert to Markdown
+doc-parser document.docx -f markdown --metadata
+
+# Save to file
+doc-parser document.docx -o output.txt
+```
+
+### Batch Processing
+```bash
+# Process all DOCX files in current directory
+doc-parser --batch . --output-dir ./converted -f json
+
+# Process files matching a pattern
+doc-parser --batch "*.docx" --output-dir ./output -f markdown
+
+# Process with limits and verbose output
+doc-parser --batch ./documents --max-files 10 -v --overwrite
+```
+
+### Performance Modes
+```bash
+# Fast text-only extraction
+doc-parser document.docx --text-only
+
+# Full parsing with metadata
+doc-parser document.docx --metadata
+
+# Preserve formatting
+doc-parser document.docx --preserve-formatting
+```
+
+## Development Workflow
+
+### For Excel Parser
+```bash
+cd src/excel-parser
+cargo test
+cargo build
+./target/debug/excel-parser sample.xlsx
+```
+
+### For DOC Parser  
+```bash
+cd src/doc-parser
+cargo test
+cargo build
+./target/debug/doc-parser sample.docx
+```
+
+### Workspace Commands
+```bash
+# From workspace root
+cargo test --all
+cargo build --all
+cargo clippy --all
+cargo fmt --all
+```
+
+## Recent Updates
+
+### Phase 4 Implementation (DOC Parser)
+- ✅ Enhanced CLI support with batch processing
+- ✅ Improved error handling with user-friendly messages
+- ✅ Advanced batch processing with glob patterns
+- ✅ Progress tracking and detailed logging
+- ✅ Comprehensive documentation and examples
+- ✅ Robust testing with 36+ passing tests
+
+### Key Features Added
+- Batch processing with directory scanning
+- Glob pattern support for file matching
+- User-friendly error messages with emojis and suggestions
+- Progress tracking and summary reports
+- Multiple processing modes (Fast, Standard, Full)
+- Comprehensive CLI validation and argument handling
