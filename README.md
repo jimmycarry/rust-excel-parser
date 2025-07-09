@@ -16,7 +16,7 @@ A cross-platform Excel parser written in Rust that converts Excel files to text 
 ### From Source
 
 ```bash
-git clone https://github.com/example/excel-parser.git
+git clone https://github.com/jimmycarry/rust-excel-parser.git
 cd excel-parser
 cargo build --release
 ```
@@ -93,20 +93,20 @@ use std::io::BufWriter;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create parser
     let parser = ExcelParser::new();
-    
+
     // Parse Excel file
     let data = parser.parse("input.xlsx")?;
-    
+
     // Create output format
     let format = OutputFormat::csv();
-    
+
     // Process and write to file
     let file = File::create("output.csv")?;
     let mut writer = BufWriter::new(file);
-    
+
     let processor = OutputProcessor::new();
     processor.process(&data, &format, &mut writer)?;
-    
+
     Ok(())
 }
 ```
@@ -114,12 +114,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Supported Formats
 
 ### Input Formats
+
 - `.xlsx` - Excel 2007+ format
 - `.xlsm` - Excel 2007+ format with macros
 - `.xlsb` - Excel 2007+ binary format
 - `.xls` - Excel 97-2003 format
 
 ### Output Formats
+
 - CSV (Comma-Separated Values)
 - TSV (Tab-Separated Values)
 - Custom delimiter-separated values
@@ -127,6 +129,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Performance
 
 The parser is optimized for performance:
+
 - Lazy loading for .xlsx and .xlsb files
 - Memory-efficient processing
 - Streaming output for large files
@@ -134,6 +137,7 @@ The parser is optimized for performance:
 ## Error Handling
 
 The parser provides detailed error messages for:
+
 - File not found
 - Unsupported file formats
 - Parsing errors
