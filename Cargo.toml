@@ -3,6 +3,7 @@ members = [
     "src/excel-parser",
     "src/doc-parser",
     "src/pdf-parser",
+    "src/ppt-parser",
 ]
 resolver = "2"
 

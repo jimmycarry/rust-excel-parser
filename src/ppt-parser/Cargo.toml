@@ -1,0 +1,35 @@
+[package]
+name = "ppt-parser"
+version = "0.1.0"
+edition = "2021"
+authors = ["Claude Code"]
+description = "A cross-platform PowerPoint parser that converts PPT/PPTX files to multiple text formats"
+license = "MIT"
+
+[[bin]]
+name = "ppt-parser"
+path = "src/main.rs"
+
+[lib]
+name = "ppt_parser"
+path = "src/lib.rs"
+
+[dependencies]
+# 共享工作区依赖
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+clap = { workspace = true }
+tempfile = { workspace = true }
+regex = { workspace = true }
+
+# PPT解析相关依赖
+zip = "0.6"
+quick-xml = { version = "0.32", features = ["serialize"] }
+tabled = "0.15"
+chrono = { version = "0.4", features = ["serde"] }
+base64 = "0.21"
+
+[dev-dependencies]
+tempfile = { workspace = true }
