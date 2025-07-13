@@ -1,11 +1,12 @@
 # Rust Document Parser Suite
 
-A comprehensive collection of high-performance document parsers written in Rust. This workspace contains parsers for Excel spreadsheets and Microsoft Word documents, providing both command-line tools and library APIs.
+A comprehensive collection of high-performance document parsers written in Rust. This workspace contains parsers for Excel spreadsheets, Microsoft Word documents, and PDF files, providing both command-line tools and library APIs.
 
 ## 🚀 Features
 
 - **📊 Excel Parser**: Convert Excel files (.xlsx, .xlsm, .xlsb, .xls) to CSV, JSON, and Table formats
 - **📄 DOC Parser**: Extract text, metadata, and structured data from Word documents (.doc, .docx)
+- **📋 PDF Parser**: Extract text, tables, and metadata from PDF documents (.pdf)
 - **🌍 Cross-platform**: Works on Windows, macOS, and Linux
 - **⚡ High Performance**: Memory-efficient processing with streaming output
 - **🔄 Batch Processing**: Process multiple files at once with progress tracking
@@ -16,10 +17,11 @@ A comprehensive collection of high-performance document parsers written in Rust.
 ## 📦 Workspace Structure
 
 ```
-rust-excel-parser/
+rust-document-parser/
 ├── src/
 │   ├── excel-parser/     # Excel file parser
-│   └── doc-parser/       # Word document parser
+│   ├── doc-parser/       # Word document parser
+│   └── pdf-parser/       # PDF document parser
 ├── Cargo.toml           # Workspace configuration
 └── README.md           # This file
 ```
@@ -29,14 +31,15 @@ rust-excel-parser/
 ### From Source
 
 ```bash
-git clone https://github.com/jimmycarry/rust-excel-parser.git
-cd rust-excel-parser
+git clone https://github.com/jimmycarry/rust-document-parser.git
+cd rust-document-parser
 cargo build --release
 ```
 
 The binaries will be available at:
 - `target/release/excel-parser`
 - `target/release/doc-parser`
+- `target/release/pdf-parser`
 
 ### Build Individual Components
 
@@ -46,6 +49,9 @@ cargo build --release -p excel-parser
 
 # Build DOC parser only
 cargo build --release -p doc-parser
+
+# Build PDF parser only
+cargo build --release -p pdf-parser
 
 # Build all
 cargo build --release
@@ -131,6 +137,49 @@ doc-parser document.docx --text-only  # Fastest
 doc-parser document.docx --metadata   # Full processing
 ```
 
+## 📋 PDF Parser
+
+### Quick Start
+
+```bash
+# Extract plain text
+./target/release/pdf-parser document.pdf
+
+# Convert to JSON with metadata
+./target/release/pdf-parser document.pdf -f json --metadata --pretty
+
+# Convert to Markdown
+./target/release/pdf-parser document.pdf -f markdown --metadata -o output.md
+```
+
+### Supported Features
+
+- **Input Formats**: .pdf (comprehensive support)
+- **Output Formats**: Text, JSON, Markdown, CSV
+- **Table Extraction**: Automatic table detection and extraction
+- **Metadata Extraction**: Title, author, creation date, page count, etc.
+- **Page-level Processing**: Extract specific pages or all pages
+- **Memory Efficient**: Streaming output architecture
+
+### Example Usage
+
+```bash
+# Basic text extraction
+pdf-parser document.pdf
+
+# Extract specific page
+pdf-parser document.pdf --page 3 -f text
+
+# Extract tables only as CSV
+pdf-parser document.pdf --tables-only -f csv
+
+# JSON output with metadata
+pdf-parser document.pdf -f json --metadata --pretty -o data.json
+
+# Markdown format with metadata
+pdf-parser document.pdf -f markdown --metadata -o document.md
+```
+
 ## 🛠️ Library Usage
 
 ### Excel Parser Library
@@ -172,6 +221,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### PDF Parser Library
+
+```rust
+use pdf_parser::{PdfParser, OutputFormat, OutputProcessor};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let parser = PdfParser::new();
+    let pdf_data = parser.parse("document.pdf")?;
+    
+    // Access metadata
+    println!("Title: {:?}", pdf_data.metadata.title);
+    println!("Page count: {}", pdf_data.metadata.page_count);
+    
+    // Extract specific page
+    let page = parser.parse_page("document.pdf", 1)?;
+    println!("Page 1 text: {}", page.text);
+    
+    // Convert to JSON
+    let format = OutputFormat::json_pretty_with_metadata();
+    let processor = OutputProcessor::new();
+    processor.process(&pdf_data, &format, &mut std::io::stdout())?;
+    
+    Ok(())
+}
+```
+
 ## 🎯 Output Formats
 
 ### Excel Parser Formats
@@ -189,6 +264,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 | Text | Plain text extraction | Line numbers, formatting preservation |
 | Markdown | Structured markdown | YAML frontmatter, headings, tables |
 | JSON | Complete document data | Metadata, sections, structure |
+
+### PDF Parser Formats
+
+| Format | Description | Features |
+|--------|-------------|----------|
+| Text | Plain text extraction | Page breaks, clean formatting |
+| JSON | Structured PDF data | Metadata, pages, tables, structure |
+| Markdown | Document with tables | Headers, formatted tables, metadata |
+| CSV | Table data only | Extracted tables with headers |
 
 ## 🔧 Command Line Options
 
@@ -228,6 +312,24 @@ Options:
   -h, --help                     Print help
 ```
 
+### PDF Parser
+
+```bash
+pdf-parser [OPTIONS] <INPUT_FILE>
+
+Options:
+  -o, --output <OUTPUT>          Output file path
+  -p, --page <PAGE>              Specific page number to process
+  -f, --format <FORMAT>          Output format: text, json, markdown, csv
+      --tables-only              Extract tables only
+      --metadata                 Include PDF metadata
+      --pretty                   Pretty print JSON
+  -d, --delimiter <DELIMITER>    CSV delimiter [default: ,]
+  -n, --no-header                Don't treat first row as header in CSV
+  -v, --verbose                  Enable verbose output
+  -h, --help                     Print help
+```
+
 ## 🚀 Performance
 
 ### Excel Parser
@@ -242,6 +344,12 @@ Options:
 - Memory-efficient document parsing
 - Streaming output architecture
 
+### PDF Parser
+- Page-level processing for memory efficiency
+- Intelligent table detection and extraction
+- Streaming text extraction
+- Optimized for both single pages and full documents
+
 ### Benchmarks
 
 | Operation | File Size | Processing Time | Memory Usage |
@@ -250,10 +358,12 @@ Options:
 | Excel to JSON | 10MB | ~3s | ~60MB |
 | DOCX to Text | 1MB | ~50ms | ~10MB |
 | DOCX to JSON | 1MB | ~150ms | ~20MB |
+| PDF to Text | 5MB | ~200ms | ~30MB |
+| PDF to JSON | 5MB | ~500ms | ~40MB |
 
 ## 🛡️ Error Handling
 
-Both parsers provide comprehensive error handling:
+All parsers provide comprehensive error handling:
 
 ```bash
 # Excel Parser
@@ -264,6 +374,11 @@ Both parsers provide comprehensive error handling:
 ❌ Unsupported file format: '.txt'
 💡 Supported formats: .doc, .docx
 💡 Try converting your file to Word format first
+
+# PDF Parser
+❌ Page not found: page 10 (document has 5 pages)
+💡 Valid page range: 1-5
+💡 Use --page option with valid page number
 ```
 
 ## 📚 Documentation
@@ -278,6 +393,9 @@ Both parsers provide comprehensive error handling:
 - Troubleshooting: `src/doc-parser/TROUBLESHOOTING.md`
 - API documentation: `cargo doc --open -p doc-parser`
 
+### PDF Parser
+- API documentation: `cargo doc --open -p pdf-parser`
+
 ## 🧪 Testing
 
 ```bash
@@ -287,6 +405,7 @@ cargo test
 # Test specific parser
 cargo test -p excel-parser
 cargo test -p doc-parser
+cargo test -p pdf-parser
 
 # Run with output
 cargo test -- --nocapture
@@ -359,12 +478,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Error handling with [thiserror](https://github.com/dtolnay/thiserror)
 - JSON serialization with [serde](https://github.com/serde-rs/serde)
 
+### PDF Parser
+- Built with [pdf-extract](https://github.com/jrmuizel/pdf-extract) for text extraction
+- Uses [lopdf](https://github.com/J-F-Liu/lopdf) for PDF document parsing
+- Table formatting with [tabled](https://github.com/zhiburt/tabled)
+- Error handling with [thiserror](https://github.com/dtolnay/thiserror)
+
 ## 📊 Project Stats
 
 - **Languages**: Rust
-- **Parsers**: 2 (Excel, DOC/DOCX)
+- **Parsers**: 3 (Excel, DOC/DOCX, PDF)
 - **Output Formats**: 5 (CSV, JSON, Table, Text, Markdown)
-- **Test Coverage**: 36+ tests
+- **Test Coverage**: 58+ tests
 - **Documentation**: Comprehensive guides and examples
 - **Cross-platform**: Windows, macOS, Linux
 
@@ -381,6 +506,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Image extraction
 - [ ] Advanced formatting preservation
 - [ ] PowerPoint support (.pptx)
+
+### PDF Parser
+- [ ] Enhanced table parsing algorithms
+- [ ] Image and chart extraction
+- [ ] Form field extraction
+- [ ] Password-protected PDF support
+- [ ] OCR integration for scanned PDFs
 
 ### General
 - [ ] Web interface

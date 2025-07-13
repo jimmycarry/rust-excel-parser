@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a cross-platform Excel parser written in Rust that converts Excel files (.xlsx, .xlsm, .xlsb, .xls) to multiple text formats (CSV, JSON, Table). The project implements a modular architecture with separate concerns for parsing, output formatting, and CLI interface.
+This is a comprehensive document parser suite written in Rust that converts multiple document formats to various text formats. The project includes parsers for Excel files (.xlsx, .xlsm, .xlsb, .xls), Word documents (.doc, .docx), and PDF files (.pdf). The suite implements a modular architecture with separate concerns for parsing, output formatting, and CLI interface.
 
 ## Build and Development Commands
 
@@ -34,6 +34,8 @@ cargo clippy
 # Run the CLI
 ./target/debug/excel-parser file.xlsx -f json --pretty
 ./target/release/excel-parser file.xlsx -f table --max-width 100
+./target/debug/doc-parser document.docx -f markdown --metadata
+./target/release/pdf-parser document.pdf -f json --metadata --pretty
 ```
 
 ## Architecture Overview
@@ -111,6 +113,13 @@ Each format implements `OutputWriter` and handles both single sheets and multi-s
 - Optimized for both single-file and batch operations
 - Memory-efficient: processes documents incrementally
 
+### PDF Parser
+- Advanced text extraction with page-level processing
+- Intelligent table detection and extraction
+- Comprehensive metadata extraction (title, author, creation date, etc.)
+- Multiple output formats: Text, JSON, Markdown, CSV
+- Memory-efficient: processes pages incrementally rather than loading entire documents
+
 ## Documentation
 
 The doc-parser includes comprehensive documentation:
@@ -162,6 +171,29 @@ doc-parser document.docx --metadata
 doc-parser document.docx --preserve-formatting
 ```
 
+## PDF Parser Usage Examples
+
+### Single File Processing
+```bash
+# Extract plain text
+pdf-parser document.pdf
+
+# Convert to JSON with metadata
+pdf-parser document.pdf -f json --metadata --pretty
+
+# Convert to Markdown
+pdf-parser document.pdf -f markdown --metadata
+
+# Extract specific page
+pdf-parser document.pdf --page 3 -f text
+
+# Extract tables only
+pdf-parser document.pdf --tables-only -f csv
+
+# Save to file
+pdf-parser document.pdf -o output.txt
+```
+
 ## Development Workflow
 
 ### For Excel Parser
@@ -178,6 +210,14 @@ cd src/doc-parser
 cargo test
 cargo build
 ./target/debug/doc-parser sample.docx
+```
+
+### For PDF Parser
+```bash
+cd src/pdf-parser
+cargo test
+cargo build
+./target/debug/pdf-parser sample.pdf
 ```
 
 ### Workspace Commands
@@ -199,10 +239,18 @@ cargo fmt --all
 - ✅ Comprehensive documentation and examples
 - ✅ Robust testing with 36+ passing tests
 
+### Phase 5 Implementation (PDF Parser)
+- ✅ Cross-platform PDF parsing with multiple output formats
+- ✅ Intelligent table detection and extraction
+- ✅ Comprehensive metadata extraction
+- ✅ Page-level processing and selective extraction
+- ✅ Memory-efficient streaming architecture
+- ✅ Comprehensive testing with 22+ passing tests
+
 ### Key Features Added
-- Batch processing with directory scanning
-- Glob pattern support for file matching
-- User-friendly error messages with emojis and suggestions
-- Progress tracking and summary reports
-- Multiple processing modes (Fast, Standard, Full)
-- Comprehensive CLI validation and argument handling
+- PDF text extraction with page-level granularity
+- Smart table detection using regex patterns
+- Multiple output formats: Text, JSON, Markdown, CSV
+- Metadata extraction (title, author, dates, page count)
+- CLI interface consistent with other parsers
+- Robust error handling and validation
